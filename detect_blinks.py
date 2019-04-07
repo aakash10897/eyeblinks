@@ -155,9 +155,6 @@ if b[0]=="n" or b[0]=="w":
 #print array
 
 print(b)
-# do a bit of cleanup
-cv2.destroyAllWindows()
-vs.stop()
 
 #declaring and initalizing a dictionary for morse table
 morse = {"._":"A","_...":"B","_._.":"C","_..":"D",".":"E",".._.":"F","__.":"G","....":"H","..":"I",".___":"J","_._":"K","._..":"L","__":"M","_.":"N","___":"O",".__.":"P","__._":"Q","._.":"R","...":"S","_":"T",".._":"U","..._":"V",".__":"W","_.._":"X","_.":"Y","__..":"Z"}
@@ -175,4 +172,10 @@ for i in range(0,len(b)):
 		alpha_str=alpha_str+" "
 		morse_str=""
 print(alpha_str)
+
+# do a bit of cleanup
+cv2.destroyAllWindows()
+vs.stop()
+
+
 
