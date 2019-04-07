@@ -45,10 +45,14 @@ EYE_AR_THRESH = 0.3
 EYE_AR_CONSEC_FRAMES = 3
 
 # initialize the frame counters and the total number of blinks
-COUNTER = 0
+OPEN = 0
+CLOSE = 0
 DASH = 0
+LETTER = 0
+WORD = 0
 DOT = 0
 b = []
+ear=0.0
 
 
 # initialize dlib's face detector (HOG-based) and then create
@@ -115,83 +119,60 @@ while True:
 
 		# check to see if the eye aspect ratio is below the blink
 		# threshold, and if so, increment the blink frame counter
-		if ear < EYE_AR_THRESH:
-			COUNTER += 1
-
-		# otherwise, the eye aspect ratio is not below the blink
-		# threshold
+		if ear<EYE_AR_THRESH:
+			CLOSE+=1
+			if OPEN>=20*EYE_AR_CONSEC_FRAMES:
+				WORD+=1
+				b.insert(len(b),"w")
+			elif OPEN>=10*EYE_AR_CONSEC_FRAMES:
+				LETTER+=1
+				b.insert(len(b),"n")
+			OPEN=0
 		else:
-			# if the eyes were closed for a sufficient number of
-			# then increment the total number of blinks
-			if COUNTER >= 10*EYE_AR_CONSEC_FRAMES and 20*EYE_AR_CONSEC_FRAMES:
+			OPEN+=1
+			if CLOSE>=10*EYE_AR_CONSEC_FRAMES:
+				DASH+=1
 				b.insert(len(b),"_")
-			elif COUNTER >= 30*EYE_AR_CONSEC_FRAMES and COUNTER < 40*EYE_AR_CONSEC_FRAMES:
+			elif CLOSE>=2*EYE_AR_CONSEC_FRAMES:
+				DOT+=1
 				b.insert(len(b),".")
-			
-			# reset the eye frame counter
-			COUNTER = 0
+			CLOSE=0
+		cv2.putText(frame,"Dot: {}".format(DOT),(10,30),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,0,255),2)
+		cv2.putText(frame,"Letter: {}".format(LETTER),(10,70),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,0,255),2)
+        cv2.putText(frame,"Word: {}".format(WORD),(10,110),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,0,255),2)
+       	cv2.putText(frame,"Dash: {}".format(DASH),(100,30),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,0,255),2)
+       	cv2.putText(frame,"EAR: {:.2f}".format(ear),(300,30),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,0,255),2) 
 
-		if ear>=EYE_AR_THRESH:
-			COUNTER += 1
-        
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> abcd
-        else:
-        	if COUNTER >= 10*EYE_AR_CONSEC_FRAMES and COUNTER < 20*EYE_AR_CONSEC_FRAMES:
-        		b.insert(len(b),"n")
-        	elif COUNTER >= 20*EYE_AR_CONSEC_FRAMES and COUNTER < 30*EYE_AR_CONSEC_FRAMES:
-        		b.insert(len(b),"w")
-<<<<<<< HEAD
-=======
-=======
-       		else:
-        		if COUNTER >= 10*EYE_AR_CONSEC_FRAMES and COUNTER < 50*EYE_AR_CONSEC_FRAMES:
-        			b.insert(len(b),"n")
-        		elif COUNTER >= 50*EYE_AR_CONSEC_FRAMES and COUNTER < 100*EYE_AR_CONSEC_FRAMES:
-        			b.insert(len(b),"w")
->>>>>>> range corrected
->>>>>>> abcd
-
-		# draw the total number of blinks on the frame along with
-		# the computed eye aspect ratio for the frame
-		cv2.putText(frame, "Dot: {}".format(DOT), (10, 30),
-			cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-		cv2.putText(frame, "Dash: {}".format(DASH), (100, 30),
-			cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-		cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
-			cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
- 
 	# show the frame
 	cv2.imshow("Frame", frame)
 	key = cv2.waitKey(1) & 0xFF
  
 	# if the `q` key was pressed, break from the loop
-<<<<<<< HEAD
 	if key == ord("q"):
 		break
-=======
-<<<<<<< HEAD
-	if key == ord("q"):
-		break
-=======
-	if key == ord("q"):s"
->>>>>>> range corrected
->>>>>>> abcd
-
+if b[0]=="n" or b[0]=="w":
+	b.remove(b[0] )
 #print array
 
 print(b)
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
 
-#declaring and initializing dictionary with morse code
+#declaring and initalizing a dictionary for morse table
 morse = {"._":"A","_...":"B","_._.":"C","_..":"D",".":"E",".._.":"F","__.":"G","....":"H","..":"I",".___":"J","_._":"K","._..":"L","__":"M","_.":"N","___":"O",".__.":"P","__._":"Q","._.":"R","...":"S","_":"T",".._":"U","..._":"V",".__":"W","_.._":"X","_.":"Y","__..":"Z"}
->>>>>>> range corrected
->>>>>>> abcd
+
+alpha_str=""
+morse_str=""
+
+for i in range(0,len(b)):
+	if b[i] != "n" and b[i] != "w":
+		morse_str=morse_str + b[i]
+	elif b[i]=="n":
+		alpha_str=alpha_str + morse[morse_str]
+		morse_str=""
+	else:
+		alpha_str=alpha_str+" "
+		morse_str=""
+print(alpha_str)
+
